@@ -99,10 +99,10 @@ memset:
   dec r23
   brne memset
 
-  ldi r23, 0xff
-  sts SRAM_START, r23
-  ldi r23, 128
-  sts SRAM_START+4, r23
+  ;ldi r23, 0xff
+  ;sts SRAM_START, r23
+  ;ldi r23, 128
+  ;sts SRAM_START+4, r23
 
   ;rcall send_ready
 
@@ -118,9 +118,9 @@ main:
   mov r19, r16
   rcall read_rgb
 
-  add r19, r19
-  add r19, r19
-  add r19, r19
+  mov r6, r19
+  add r19, r6
+  add r19, r6
   ldi r28, (SRAM_START)&0xff
   ldi r29, (SRAM_START)>>8
   add r28, r19
@@ -128,7 +128,6 @@ main:
   st Y+, r8
   st Y+, r7
   st Y+, r9
-  rcall send_led_data
 
   ;rcall send_led_data
   ldi r16, '*'
@@ -153,7 +152,7 @@ not_fe:
 parse_command_exit: 
   ldi r16, '*'
   rcall send_byte
-  ret
+  rjmp main
 
 ;; Set all pixels to RGB (r7, r8, r9)
 set_all:

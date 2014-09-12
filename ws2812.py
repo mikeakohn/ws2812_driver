@@ -28,7 +28,9 @@ ser = serial.Serial("/dev/ttyUSB1", 9600)
 print ser.name
 
 #set_all(ser, 10, 30, 40)
-set_rgb(ser, 20, 10, 30, 40)
+set_rgb(ser, 18, 40, 30, 100)
+set_rgb(ser, 21, 100, 0, 0)
+set_rgb(ser, 22, 0, 100, 0)
 refresh(ser)
 
 ser.close()
