@@ -28,12 +28,13 @@ DATA_OUT equ 2
 ; r14 = temp
 ; r16 = paramter to function
 ; r17 = temp
-; r18 = temp
+; r18 =
+; r19 = 
 ; r20 = count in interrupt
 ; r21 =
 ; r22 =
 ; r23 =
-; r24 = counter to make sure we don't hit an infinite loop
+; r24 =
 ; r25 =
 ; r26 =
 ; r27 =
@@ -103,21 +104,79 @@ memset:
   ldi r23, 128
   sts SRAM_START+4, r23
 
-  rcall send_ready
+  ;rcall send_ready
 
 main:
   sbic PINB, RX_PIN
   rjmp main
 
-  ;rcall read_byte
-  ;rcall send_byte
-  ;rjmp main
-
   rcall read_byte
+  cpi r16, 0xff
+  breq parse_command
+
+  ;; pixel#, r, g, b
+  mov r19, r16
+  rcall read_rgb
+
+  add r19, r19
+  add r19, r19
+  add r19, r19
+  ldi r28, (SRAM_START)&0xff
+  ldi r29, (SRAM_START)>>8
+  add r28, r19
+  adc r29, r0
+  st Y+, r8
+  st Y+, r7
+  st Y+, r9
   rcall send_led_data
+
+  ;rcall send_led_data
   ldi r16, '*'
   rcall send_byte
   rjmp main
+
+parse_command:
+  rcall read_byte
+
+  cpi r16, 0xff
+  brne not_ff
+  rcall send_led_data
+  rjmp parse_command_exit
+not_ff:
+
+  cpi r16, 0xfe
+  brne not_fe
+  rcall set_all
+  rjmp parse_command_exit
+not_fe:
+
+parse_command_exit: 
+  ldi r16, '*'
+  rcall send_byte
+  ret
+
+;; Set all pixels to RGB (r7, r8, r9)
+set_all:
+  rcall read_rgb
+  ldi r28, (SRAM_START)&0xff
+  ldi r29, (SRAM_START)>>8
+  ldi r23, 40 
+set_all_loop:
+  st Y+, r8
+  st Y+, r7
+  st Y+, r9
+  dec r23
+  brne set_all_loop
+  ret
+
+read_rgb:
+  rcall read_byte
+  mov r7, r16
+  rcall read_byte
+  mov r8, r16
+  rcall read_byte
+  mov r9, r16
+  ret
 
 send_led_data:
   ;; Y points to LED data, r23 counts 120 bytes
