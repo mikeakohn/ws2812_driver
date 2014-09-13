@@ -38,8 +38,24 @@ for i in range(0, 10):
 for i in range(0, 5): leds.set_rgb(4 + i * 8, 0, 100, 0)
 leds.refresh()
 
-for i in range(0, 10):
+for i in range(0, 5):
   leds.shift_right_8x5()
+  leds.refresh()
+  time.sleep(1)
+
+leds.set_all(0, 0, 100)
+leds.refresh()
+
+for i in range(0, 3):
+  leds.shift_up_8x5()
+  leds.refresh()
+  time.sleep(1)
+
+leds.set_all(100, 0, 0)
+leds.refresh()
+
+for i in range(0, 3):
+  leds.shift_down_8x5()
   leds.refresh()
   time.sleep(1)
 

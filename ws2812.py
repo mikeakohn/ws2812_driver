@@ -50,4 +50,14 @@ class ws2812:
     self.ser.write(chr(0xfa))
     self.ser.read(1)
 
+  def shift_up_8x5(self):
+    self.ser.write(chr(0xff))
+    self.ser.write(chr(0xf9))
+    self.ser.read(1)
+
+  def shift_down_8x5(self):
+    self.ser.write(chr(0xff))
+    self.ser.write(chr(0xf8))
+    self.ser.read(1)
+
 

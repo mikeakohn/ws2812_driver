@@ -175,6 +175,18 @@ not_fb:
   rjmp parse_command_exit
 not_fa:
 
+  cpi r16, 0xf9
+  brne not_f9
+  rcall shift_up_8x5
+  rjmp parse_command_exit
+not_f9:
+
+  cpi r16, 0xf8
+  brne not_f8
+  rcall shift_down_8x5
+  rjmp parse_command_exit
+not_f8:
+
 parse_command_exit: 
   ldi r16, '*'
   rcall send_byte
@@ -258,6 +270,47 @@ shift_right_8x5_loop:
   adiw r28, 7*3
   dec r23
   brne shift_right_8x5_loop
+  ret
+
+shift_up_8x5:
+  ldi r28, (SRAM_START)&0xff
+  ldi r29, (SRAM_START)>>8
+  ldi r30, (SRAM_START)&0xff
+  ldi r31, (SRAM_START)>>8
+  adiw r30, 3*8
+  ldi r23, 120-(3*8)
+shift_up_8x5_loop:
+  ld r11, Z+
+  st Y+, r11
+  dec r23
+  brne shift_up_8x5_loop
+  ldi r23, 3*8
+shift_up_8x5_clear_bottom:
+  st Y+, r0
+  dec r23
+  brne shift_up_8x5_clear_bottom
+  ret
+
+shift_down_8x5:
+  ldi r28, (SRAM_START)&0xff
+  ldi r29, (SRAM_START)>>8
+  ldi r30, (SRAM_START)&0xff
+  ldi r31, (SRAM_START)>>8
+  adiw r30, 60
+  adiw r30, 60-(3*8)
+  adiw r28, 60 
+  adiw r28, 60 
+  ldi r23, 120-(3*8)
+shift_down_8x5_loop:
+  ld r11, -Z 
+  st -Y, r11
+  dec r23
+  brne shift_down_8x5_loop
+  ldi r23, 3*8
+shift_down_8x5_clear_top:
+  st -Y, r0
+  dec r23
+  brne shift_down_8x5_clear_top
   ret
 
 read_rgb:
