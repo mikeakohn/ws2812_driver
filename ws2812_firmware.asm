@@ -125,9 +125,9 @@ main:
   ldi r29, (SRAM_START)>>8
   add r28, r19
   adc r29, r0
-  st Y+, r8
-  st Y+, r7
-  st Y+, r9
+  st Y+, r11
+  st Y+, r10
+  st Y+, r12
 
   ;rcall send_led_data
   ldi r16, '*'
@@ -135,6 +135,8 @@ main:
   rjmp main
 
 parse_command:
+  ;ldi r16, '?'
+  ;rcall send_byte
   rcall read_byte
 
   cpi r16, 0xff
@@ -161,20 +163,20 @@ set_all:
   ldi r29, (SRAM_START)>>8
   ldi r23, 40 
 set_all_loop:
-  st Y+, r8
-  st Y+, r7
-  st Y+, r9
+  st Y+, r11
+  st Y+, r10
+  st Y+, r12
   dec r23
   brne set_all_loop
   ret
 
 read_rgb:
   rcall read_byte
-  mov r7, r16
+  mov r10, r16 
   rcall read_byte
-  mov r8, r16
+  mov r11, r16
   rcall read_byte
-  mov r9, r16
+  mov r12, r16 
   ret
 
 send_led_data:
@@ -182,17 +184,6 @@ send_led_data:
   ldi r28, (SRAM_START)&0xff
   ldi r29, (SRAM_START)>>8
   ldi r23, 120        ; byte_count = 120
-
-.if 0
-  ;; Start by sending a reset pulse
-  out TCNT0, r0
-  clr r20
-  cbi PORTB, DATA_OUT 
-wait_reset_pulse:
-  cpi r20, 4 
-  brne wait_reset_pulse
-.endif
-  ;sbi PORTB, DATA_OUT 
 
   cli     ; No interrupts while sending LED data
 
@@ -311,6 +302,10 @@ wait_data_bit:
 
 ;; read_byte(r16) Software UART
 read_byte:
+  ;; Wait for data
+  sbic PINB, RX_PIN
+  rjmp read_byte
+
   ; with /1 prescale this is 255 ticks for an interrupt * 8, approx 1/9600
   ; Wait 1.5 bits (full start bit + 1/2 of the first data bit so we
   ; sample in the center of all 8 bits
