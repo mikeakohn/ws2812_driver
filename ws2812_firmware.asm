@@ -187,6 +187,24 @@ not_f9:
   rjmp parse_command_exit
 not_f8:
 
+  cpi r16, 0xf7
+  brne not_f7
+  rcall set_all_not_off
+  rjmp parse_command_exit
+not_f7:
+
+  cpi r16, 0xf6
+  brne not_f6
+  rcall fade_out
+  rjmp parse_command_exit
+not_f6:
+
+  cpi r16, 0xf5
+  brne not_f5
+  rcall fade_in
+  rjmp parse_command_exit
+not_f5:
+
 parse_command_exit: 
   ldi r16, '*'
   rcall send_byte
@@ -311,6 +329,91 @@ shift_down_8x5_clear_top:
   st -Y, r0
   dec r23
   brne shift_down_8x5_clear_top
+  ret
+
+;; Set all pixels that aren't currently (0,0,0) to RGB (r7, r8, r9)
+set_all_not_off:
+  rcall read_rgb
+  ldi r28, (SRAM_START)&0xff
+  ldi r29, (SRAM_START)>>8
+  ldi r23, 40 
+set_all_loop_not_off:
+  ld r13, Y+
+  ld r14, Y+
+  ld r15, Y+
+  tst r13
+  brne set_all_not_off_do
+  tst r14
+  brne set_all_not_off_do
+  tst r15
+  breq set_all_not_off_skip
+set_all_not_off_do:
+  sbiw r28, 3
+  st Y+, r11
+  st Y+, r10
+  st Y+, r12
+set_all_not_off_skip:
+  dec r23
+  brne set_all_loop_not_off
+  ret
+
+fade_out:
+  rcall read_rgb
+  ldi r28, (SRAM_START)&0xff
+  ldi r29, (SRAM_START)>>8
+  ldi r23, 40 
+fade_out_loop:
+  ld r26, Y            ; fade out green
+  cp r11, r26          ; if diff_g < current_g { okay } else { saturate }
+  brlo fade_out_g_okay
+  mov r26, r11
+fade_out_g_okay:
+  sub r26, r11
+  st Y+, r26
+  ld r26, Y            ; fade out red
+  cp r10, r26          ; if diff_r < current_r { okay } else { saturate }
+  brlo fade_out_r_okay
+  mov r26, r10
+fade_out_r_okay:
+  sub r26, r10
+  st Y+, r26
+  ld r26, Y            ; fade out blue
+  cp r12, r26          ; if diff_b < current_b { okay } else { saturate }
+  brlo fade_out_b_okay
+  mov r26, r12
+fade_out_b_okay:
+  sub r26, r12
+  st Y+, r26
+  dec r23
+  brne fade_out_loop
+  ret
+
+fade_in:
+  rcall read_rgb
+  ldi r28, (SRAM_START)&0xff
+  ldi r29, (SRAM_START)>>8
+  ldi r23, 40 
+fade_in_loop:
+  ld r26, Y            ; fade in green
+  add r26, r11
+  brcc fade_in_g_okay
+  ldi r26, 0xff
+fade_in_g_okay:
+  st Y+, r26
+  ld r26, Y            ; fade in red
+  add r26, r10
+  brcc fade_in_r_okay
+  ldi r26, 0xff
+fade_in_r_okay:
+  st Y+, r26
+  ld r26, Y            ; fade in blue
+  add r26, r12
+  brcc fade_in_b_okay
+  ldi r26, 0xff
+fade_in_b_okay:
+  st Y+, r26
+  dec r23
+  brne fade_in_loop
   ret
 
 read_rgb:

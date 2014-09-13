@@ -59,9 +59,27 @@ for i in range(0, 3):
   leds.refresh()
   time.sleep(1)
 
-#leds.set_rgb(18, 0, 0, 0)
-#leds.set_rgb(19, 40, 30, 100)
-#leds.set_rgb(21, 100, 0, 0)
-#leds.set_rgb(22, 0, 100, 0)
-#leds.refresh()
+leds.set_all_not_off(0,0,100)
+leds.refresh()
+time.sleep(1)
+
+leds.fade_out(50,0,50)
+leds.refresh()
+time.sleep(1)
+
+leds.fade_out(50,0,60)
+leds.refresh()
+time.sleep(1)
+
+for i in range(10, 20): leds.set_rgb(i, 40, 30, 100)
+leds.refresh()
+time.sleep(1)
+
+for i in range(0, 10):
+  leds.fade_in(10,4,7)
+  leds.refresh()
+  time.sleep(1)
+
+leds.set_all(0, 0, 0)
+leds.refresh()
 

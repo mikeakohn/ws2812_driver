@@ -60,4 +60,28 @@ class ws2812:
     self.ser.write(chr(0xf8))
     self.ser.read(1)
 
+  def set_all_not_off(self,r,g,b):
+    self.ser.write(chr(0xff))
+    self.ser.write(chr(0xf7))
+    self.ser.write(chr(r))
+    self.ser.write(chr(g))
+    self.ser.write(chr(b))
+    self.ser.read(1)
+
+  def fade_out(self,r,g,b):
+    self.ser.write(chr(0xff))
+    self.ser.write(chr(0xf6))
+    self.ser.write(chr(r))
+    self.ser.write(chr(g))
+    self.ser.write(chr(b))
+    self.ser.read(1)
+
+  def fade_in(self,r,g,b):
+    self.ser.write(chr(0xff))
+    self.ser.write(chr(0xf5))
+    self.ser.write(chr(r))
+    self.ser.write(chr(g))
+    self.ser.write(chr(b))
+    self.ser.read(1)
+
 

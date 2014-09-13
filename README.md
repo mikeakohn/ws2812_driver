@@ -37,5 +37,8 @@ index, r, g, b       Change pixel color at index
 0xff, 0xfa           Shift all pixels right (for 8x5 panel of LEDS) 
 0xff, 0xf9           Shift all pixels up (for 8x5 panel of LEDS) 
 0xff, 0xf8           Shift all pixels down (for 8x5 panel of LEDS) 
+0xff, 0xf7, r, g, b  Set all pixels that are not 0,0,0 to this value
+0xff, 0xf6, r, g, b  Subtract this (r,g,b) vector from all pixels (fade out)
+0xff, 0xf5, r, g, b  Add this (r,g,b) vector to all pixels (fade in?) 
 
 
