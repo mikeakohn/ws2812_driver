@@ -151,6 +151,18 @@ not_ff:
   rjmp parse_command_exit
 not_fe:
 
+  cpi r16, 0xfd
+  brne not_fd
+  rcall shift_left_linear
+  rjmp parse_command_exit
+not_fd:
+
+  cpi r16, 0xfc
+  brne not_fc
+  rcall shift_right_linear
+  rjmp parse_command_exit
+not_fc:
+
 parse_command_exit: 
   ldi r16, '*'
   rcall send_byte
@@ -168,6 +180,43 @@ set_all_loop:
   st Y+, r12
   dec r23
   brne set_all_loop
+  ret
+
+shift_left_linear:
+  ldi r28, (SRAM_START)&0xff
+  ldi r29, (SRAM_START)>>8
+  ldi r30, (SRAM_START)&0xff
+  ldi r31, (SRAM_START)>>8
+  adiw r30, 3
+  ldi r23, 120-3 
+shift_left_linear_loop:
+  ld r11, Z+
+  st Y+, r11
+  dec r23
+  brne shift_left_linear_loop
+  st Y+, r0
+  st Y+, r0
+  st Y+, r0
+  ret
+
+shift_right_linear:
+  ldi r28, (SRAM_START)&0xff
+  ldi r29, (SRAM_START)>>8
+  ldi r30, (SRAM_START)&0xff
+  ldi r31, (SRAM_START)>>8
+  adiw r30, 60
+  adiw r30, 60-3
+  adiw r28, 60 
+  adiw r28, 60 
+  ldi r23, 120-3 
+shift_right_linear_loop:
+  ld r11, -Z 
+  st -Y, r11
+  dec r23
+  brne shift_right_linear_loop
+  st -Y, r0
+  st -Y, r0
+  st -Y, r0
   ret
 
 read_rgb:
