@@ -13,14 +13,14 @@ class ws2812:
   def refresh(self):
     self.ser.write(chr(0xff))
     self.ser.write(chr(0xff))
-    print self.ser.read(1)
+    self.ser.read(1)
 
   def set_rgb(self, index, r, g, b):
     self.ser.write(chr(index))
     self.ser.write(chr(r))
     self.ser.write(chr(g))
     self.ser.write(chr(b))
-    print self.ser.read(1)
+    self.ser.read(1)
 
   def set_all(self, r, g, b):
     self.ser.write(chr(0xff))
@@ -28,14 +28,26 @@ class ws2812:
     self.ser.write(chr(r))
     self.ser.write(chr(g))
     self.ser.write(chr(b))
-    print self.ser.read(1)
+    self.ser.read(1)
 
   def shift_left_linear(self):
     self.ser.write(chr(0xff))
     self.ser.write(chr(0xfd))
+    self.ser.read(1)
 
   def shift_right_linear(self):
     self.ser.write(chr(0xff))
     self.ser.write(chr(0xfc))
+    self.ser.read(1)
+
+  def shift_left_8x5(self):
+    self.ser.write(chr(0xff))
+    self.ser.write(chr(0xfb))
+    self.ser.read(1)
+
+  def shift_right_8x5(self):
+    self.ser.write(chr(0xff))
+    self.ser.write(chr(0xfa))
+    self.ser.read(1)
 
 
